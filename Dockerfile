@@ -36,7 +36,8 @@ RUN apt install -y nano emacs
 RUN apt install -y wget gpg
 RUN wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > packages.microsoft.gpg
 RUN install -D -o root -g root -m 644 packages.microsoft.gpg /etc/apt/keyrings/packages.microsoft.gpg
-RUN echo "deb [arch=amd64,arm64,armhf signed-by=/etc/apt/keyrings/packages.microsoft.gpg] https://packages.microsoft.com/repos/code stable main" | tee /etc/apt/sources.list.d/vscode.list > /dev/null
+RUN echo "deb [arch=amd64,arm64,armhf signed-by=/etc/apt/keyrings/packages.microsoft.gpg] https://packages.microsoft.com/repos/code stable main" | tee /etc/apt/sources.list.d/vscode.list > /dev/nulla
+# RUN https://packages.microsoft.com/repos/code stable main" |sudo tee /etc/apt/sources.list.d/vscode.list > /dev/null
 RUN apt install -y apt-transport-https
 RUN apt update
 RUN apt install -y code
@@ -68,11 +69,21 @@ RUN apt install -y ros-jazzy-ros-gz
 ## Building
 ### Create workspace
 USER $USER
-RUN mkdir -p ~/create3_ws/src
-RUN cd ~/create3_ws/src
-RUN git clone https://github.com/iRobotEducation/create3_sim.git
-RUN git clone https://github.com/iRobotEducation/irobot_create_msgs.git
+RUN mkdir -p /home/utn_robotica/create3_ws/src
+RUN cd /home/utn_robotica/create3_ws/src
+RUN git clone https://github.com/iRobotEducation/create3_sim.git /home/utn_robotica/create3_ws/src/create3_sim/
+RUN git clone https://github.com/iRobotEducation/irobot_create_msgs.git /home/utn_robotica/create3_ws/src/irobot_create_msgs/
 RUN cd ~/create3_ws
+
+### Open Navigation Packages 
+USER root
+RUN git clone https://github.com/open-navigation/opennav_coverage.git /opt/ros/jazzy/opennav_coverage/
+RUN git clone https://github.com/open-navigation/slam_toolbox.git /opt/ros/jazzy/slam_toolbox/
+RUN git clone https://github.com/open-navigation/robot_localization.git /opt/ros/jazzy/robot_localization/
+RUN git clone https://github.com/open-navigation/gz2-toy-demos.git /opt/ros/jazzy/gz2-toy-demos/
+RUN git clone https://github.com/open-navigation/opennav_amd_demonstrations.git /opt/ros/jazzy/opennav_amd_demonstrations/
+RUN git clone https://github.com/open-navigation/opennav_docking.git /opt/ros/jazzy/opennav_docking/
+RUN git clone https://github.com/open-navigation/launch_ros.git /opt/ros/jazzy/launch_ros/
 
 USER root
 RUN apt-get update
@@ -82,7 +93,7 @@ RUN rosdep init
 USER $USER
 RUN cd ~/create3_ws
 RUN source /opt/ros/jazzy/setup.sh
-RUN rosdep update
+# RUN rosdep update
 # RUN rosdep install --from-path ~/create3_ws/src -yi
 # RUN colcon build --symlink-install
 # RUN source install/local_setup.bash
@@ -95,6 +106,6 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 ENV QT_DEBUG_PLUGINS=1
 
-USER $USER
+# USER $USER
 
 CMD ["/bin/bash"]
